@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pipeline Tracker — Job Search OS</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .container { max-width: 960px; margin: 0 auto; }
+
+    h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+    .subtitle { font-size: 0.875rem; color: #666; margin-bottom: 24px; }
+
+    /* Funnel */
+    .funnel-wrap {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .funnel-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #666;
+      margin-bottom: 14px;
+    }
+
+    .funnel-stages {
+      display: flex;
+      gap: 6px;
+      align-items: flex-end;
+      justify-content: center;
+      height: 120px;
+    }
+
+    .stage-bar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .bar-fill {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      min-height: 6px;
+      transition: height 0.3s;
+    }
+
+    .bar-label {
+      font-size: 0.65rem;
+      text-align: center;
+      color: #555;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .bar-count {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    /* Add role form */
+    .card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 580px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 4px;
+    }
+
+    button {
+      padding: 9px 18px;
+      border-radius: 6px;
+      border: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover { opacity: 0.85; }
+
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-secondary { background: #f0f0f0; color: #333; }
+    .btn-danger { background: #dc2626; color: #fff; padding: 5px 10px; font-size: 0.75rem; }
+    .btn-sm { background: #e5e7eb; color: #333; padding: 4px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 2px solid #e0e0e0;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #666;
+      white-space: nowrap;
+    }
+    td { padding: 9px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafafa; }
+
+    .stage-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .lane-tag {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 8px;
+      font-size: 0.68rem;
+      background: #e0e7ff;
+      color: #3730a3;
+      font-weight: 600;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #999;
+      padding: 32px 0;
+      font-size: 0.9rem;
+    }
+
+    .actions-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Pipeline Tracker</h1>
+    <p class="subtitle">Track every role across the 8-stage funnel. Data stays in your browser.</p>
+
+    <!-- Funnel visualization -->
+    <div class="funnel-wrap">
+      <div class="funnel-title">Funnel</div>
+      <div class="funnel-stages" id="funnel-stages"></div>
+    </div>
+
+    <!-- Add role form -->
+    <div class="card">
+      <div class="card-title" id="form-title">Add a Role</div>
+      <div class="form-grid">
+        <div>
+          <label class="form-label">Company</label>
+          <input id="f-company" type="text" placeholder="Acme Corp">
+        </div>
+        <div>
+          <label class="form-label">Role Title</label>
+          <input id="f-title" type="text" placeholder="Head of Operations">
+        </div>
+        <div>
+          <label class="form-label">URL</label>
+          <input id="f-url" type="text" placeholder="https://...">
+        </div>
+        <div>
+          <label class="form-label">Lane</label>
+          <select id="f-lane">
+            <option value="">— select —</option>
+            <option value="LANE_A">Lane A</option>
+            <option value="LANE_B">Lane B</option>
+            <option value="LANE_C">Lane C</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Stage</label>
+          <select id="f-stage">
+            <option value="SOURCED">Sourced</option>
+            <option value="APPLIED">Applied</option>
+            <option value="RECRUITER">Recruiter Screen</option>
+            <option value="HM">Hiring Manager</option>
+            <option value="ONSITE">Onsite / Loop</option>
+            <option value="OFFER">Offer</option>
+            <option value="REJECTED">Rejected</option>
+            <option value="GHOSTED">Ghosted</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Date</label>
+          <input id="f-date" type="date">
+        </div>
+      </div>
+      <button class="btn-primary" id="form-submit-btn" onclick="submitForm()">Add Role</button>
+      <button class="btn-secondary" id="form-cancel-btn" style="display:none;margin-left:8px;" onclick="cancelEdit()">Cancel</button>
+    </div>
+
+    <!-- Role list -->
+    <div class="card">
+      <div class="card-title">All Roles</div>
+      <div class="table-wrap">
+        <div class="empty-state" id="table-empty">No roles tracked yet. Add the first one above.</div>
+        <table id="pipeline-table" style="display:none;">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Title</th>
+              <th>Lane</th>
+              <th>Stage</th>
+              <th>Date</th>
+              <th>Days</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="pipeline-body"></tbody>
+        </table>
+      </div>
+      <div class="actions-bar">
+        <button class="btn-secondary" onclick="exportData()">Export JSON</button>
+        <label>
+          <span class="btn-secondary" style="display:inline-block;padding:9px 18px;border-radius:6px;font-size:0.875rem;font-weight:600;cursor:pointer;background:#f0f0f0;color:#333;">Import JSON</span>
+          <input type="file" accept=".json" onchange="importData(event)" style="display:none;">
+        </label>
+        <button class="btn-secondary" onclick="clearAll()" style="margin-left:auto;color:#dc2626;">Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STAGES = [
+      { code: 'SOURCED',   label: 'Sourced',   color: '#94a3b8' },
+      { code: 'APPLIED',   label: 'Applied',   color: '#60a5fa' },
+      { code: 'RECRUITER', label: 'Recruiter', color: '#a78bfa' },
+      { code: 'HM',        label: 'HM',        color: '#f472b6' },
+      { code: 'ONSITE',    label: 'Onsite',    color: '#fb923c' },
+      { code: 'OFFER',     label: 'Offer',     color: '#34d399' },
+      { code: 'REJECTED',  label: 'Rejected',  color: '#f87171' },
+      { code: 'GHOSTED',   label: 'Ghosted',   color: '#d1d5db' },
+    ];
+
+    const STAGE_MAP = Object.fromEntries(STAGES.map(s => [s.code, s]));
+
+    function loadData() {
+      try { return JSON.parse(localStorage.getItem('pipeline_tracker') || '[]'); }
+      catch { return []; }
+    }
+
+    function saveData(data) {
+      localStorage.setItem('pipeline_tracker', JSON.stringify(data));
+    }
+
+    function daysSince(dateStr) {
+      if (!dateStr) return '—';
+      const d = new Date(dateStr);
+      if (isNaN(d)) return '—';
+      const diff = Math.floor((Date.now() - d.getTime()) / 86400000);
+      return diff;
+    }
+
+    // Set today's date as default in the form
+    document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+
+    let editingId = null;
+
+    function submitForm() {
+      const company = document.getElementById('f-company').value.trim();
+      const title = document.getElementById('f-title').value.trim();
+      const url = document.getElementById('f-url').value.trim();
+      const lane = document.getElementById('f-lane').value;
+      const stage = document.getElementById('f-stage').value;
+      const date = document.getElementById('f-date').value;
+
+      if (!company || !title) {
+        alert('Company and title are required.');
+        return;
+      }
+
+      const data = loadData();
+
+      if (editingId !== null) {
+        const idx = data.findIndex(r => r.id === editingId);
+        if (idx !== -1) {
+          data[idx] = { ...data[idx], company, title, url, lane, stage, date, lastUpdated: new Date().toISOString() };
+        }
+        editingId = null;
+      } else {
+        data.push({
+          id: Date.now(),
+          company, title, url, lane, stage, date,
+          added: new Date().toISOString(),
+          lastUpdated: new Date().toISOString()
+        });
+      }
+
+      saveData(data);
+      resetForm();
+      render();
+    }
+
+    function resetForm() {
+      document.getElementById('f-company').value = '';
+      document.getElementById('f-title').value = '';
+      document.getElementById('f-url').value = '';
+      document.getElementById('f-lane').value = '';
+      document.getElementById('f-stage').value = 'SOURCED';
+      document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+      document.getElementById('form-title').textContent = 'Add a Role';
+      document.getElementById('form-submit-btn').textContent = 'Add Role';
+      document.getElementById('form-cancel-btn').style.display = 'none';
+      editingId = null;
+    }
+
+    function cancelEdit() {
+      resetForm();
+    }
+
+    function editRole(id) {
+      const data = loadData();
+      const row = data.find(r => r.id === id);
+      if (!row) return;
+      editingId = id;
+      document.getElementById('f-company').value = row.company || '';
+      document.getElementById('f-title').value = row.title || '';
+      document.getElementById('f-url').value = row.url || '';
+      document.getElementById('f-lane').value = row.lane || '';
+      document.getElementById('f-stage').value = row.stage || 'SOURCED';
+      document.getElementById('f-date').value = row.date || new Date().toISOString().slice(0,10);
+      document.getElementById('form-title').textContent = 'Edit Role';
+      document.getElementById('form-submit-btn').textContent = 'Save Changes';
+      document.getElementById('form-cancel-btn').style.display = 'inline-block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteRole(id) {
+      if (!confirm('Remove this role from the tracker?')) return;
+      const data = loadData().filter(r => r.id !== id);
+      saveData(data);
+      render();
+    }
+
+    function render() {
+      const data = loadData();
+      renderFunnel(data);
+      renderTable(data);
+    }
+
+    function renderFunnel(data) {
+      const counts = {};
+      for (const s of STAGES) counts[s.code] = 0;
+      for (const row of data) {
+        if (counts[row.stage] !== undefined) counts[row.stage]++;
+      }
+
+      const maxCount = Math.max(1, ...Object.values(counts));
+      const container = document.getElementById('funnel-stages');
+      container.innerHTML = STAGES.map(s => {
+        const count = counts[s.code] || 0;
+        const height = Math.max(6, Math.round((count / maxCount) * 90));
+        return `
+          <div class="stage-bar">
+            <div class="bar-count">${count}</div>
+            <div class="bar-fill" style="height:${height}px;background:${s.color};" title="${s.label}: ${count}"></div>
+            <div class="bar-label">${s.label}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderTable(data) {
+      const emptyEl = document.getElementById('table-empty');
+      const tableEl = document.getElementById('pipeline-table');
+      const tbody = document.getElementById('pipeline-body');
+
+      if (data.length === 0) {
+        emptyEl.style.display = 'block';
+        tableEl.style.display = 'none';
+        return;
+      }
+
+      emptyEl.style.display = 'none';
+      tableEl.style.display = 'table';
+
+      // Sort: active stages first (not rejected/ghosted), then by date desc
+      const stageOrder = { SOURCED:0, APPLIED:1, RECRUITER:2, HM:3, ONSITE:4, OFFER:5, REJECTED:6, GHOSTED:7 };
+      const sorted = [...data].sort((a,b) => {
+        const so = (stageOrder[a.stage]||0) - (stageOrder[b.stage]||0);
+        if (so !== 0) return so;
+        return (b.date||'').localeCompare(a.date||'');
+      });
+
+      tbody.innerHTML = sorted.map(row => {
+        const stageMeta = STAGE_MAP[row.stage] || { color: '#ccc', label: row.stage };
+        const days = daysSince(row.date);
+        const daysEl = typeof days === 'number' && days > 14 && row.stage === 'APPLIED'
+          ? `<span style="color:#dc2626;font-weight:700;">${days}d ⚠️</span>`
+          : typeof days === 'number' ? `${days}d` : '—';
+        const titleEl = row.url
+          ? `<a href="${row.url}" target="_blank" style="color:#2563eb;text-decoration:none;">${row.title}</a>`
+          : row.title;
+        return `<tr>
+          <td>${row.company}</td>
+          <td>${titleEl}</td>
+          <td>${row.lane ? `<span class="lane-tag">${row.lane}</span>` : '—'}</td>
+          <td><span class="stage-pill" style="background:${stageMeta.color};color:#fff;">${stageMeta.label}</span></td>
+          <td style="color:#666;font-size:0.8rem;">${row.date || '—'}</td>
+          <td style="font-size:0.8rem;">${daysEl}</td>
+          <td style="white-space:nowrap;">
+            <button class="btn-sm" onclick="editRole(${row.id})">Edit</button>
+            &nbsp;
+            <button class="btn-danger" onclick="deleteRole(${row.id})">✕</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function exportData() {
+      const data = loadData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pipeline-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!Array.isArray(data)) { alert('Invalid format: expected a JSON array.'); return; }
+          saveData(data);
+          render();
+        } catch (err) {
+          alert('Could not parse JSON: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function clearAll() {
+      if (!confirm('Remove ALL roles from the tracker? This cannot be undone.')) return;
+      saveData([]);
+      render();
+    }
+
+    render();
+  </script>
+</body>
+</html>

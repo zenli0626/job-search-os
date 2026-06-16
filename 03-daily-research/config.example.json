@@ -1,0 +1,26 @@
+{
+  "greenhouse": [
+    "acme-corp",
+    "globex-inc"
+  ],
+  "ashby": [
+    "initech"
+  ],
+  "lever": [
+    "umbrella-corp"
+  ],
+  "lanes": {
+    "LANE_A": "strategy|operations|chief of staff|biz ops",
+    "LANE_B": "product|program manager|PMM",
+    "LANE_C": "analytics|data science|insights"
+  },
+  "exclude": "intern|junior|entry.level|staff engineer|software engineer",
+  "levels": "senior|lead|principal|director|head of|VP|manager",
+  "exclude_locations": [
+    "London",
+    "Berlin",
+    "Singapore",
+    "Toronto",
+    "Amsterdam"
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "strengthBuckets": [
+    {
+      "name": "Data & Analytics",
+      "weight": 0.3,
+      "triggers": [
+        "data", "analytics", "sql", "metrics", "dashboard", "kpi", "reporting",
+        "analysis", "insights", "data-driven", "quantitative", "measurement",
+        "funnel", "attribution"
+      ],
+      "pitchLine": "I bring a strong analytics foundation — from KPI design to SQL-based funnel analysis — and believe good decisions start with well-structured measurement."
+    },
+    {
+      "name": "Cross-functional Leadership",
+      "weight": 0.3,
+      "triggers": [
+        "cross-functional", "stakeholder", "alignment", "roadmap", "program manager",
+        "influence", "partner", "collaboration", "coordination", "executive",
+        "communication", "initiative", "organizational"
+      ],
+      "pitchLine": "Driving alignment across engineering, product, marketing, and finance is where I've done my most impactful work — I'm most effective when the problem requires getting diverse stakeholders to a shared decision."
+    },
+    {
+      "name": "Domain Expertise",
+      "weight": 0.4,
+      "triggers": [
+        "marketplace", "two-sided", "supply", "demand", "operations", "strategy",
+        "business operations", "biz ops", "growth", "monetization", "pricing",
+        "platform", "scale", "go-to-market", "GTM"
+      ],
+      "pitchLine": "My domain sits at the intersection of marketplace operations and growth strategy — I've worked on the supply/demand balance, pricing levers, and the operational systems that sustain scale."
+    }
+  ],
+  "gapBuckets": [
+    {
+      "name": "Engineering / Technical",
+      "weight": 0.5,
+      "triggers": [
+        "engineer", "software engineer", "code", "coding", "programming", "python",
+        "javascript", "java", "backend", "frontend", "api", "architecture",
+        "infrastructure", "devops"
+      ],
+      "framingLine": "While I work closely with engineering and am comfortable with data tooling, I'm not a software engineer — I'd be joining as a non-technical partner."
+    },
+    {
+      "name": "Finance / Accounting",
+      "weight": 0.3,
+      "triggers": [
+        "p&l", "profit and loss", "cpa", "cfa", "accounting", "gaap", "ifrs",
+        "financial statements", "audit", "budget ownership", "fiscal", "treasury"
+      ],
+      "framingLine": "I can build financial models and work from P&L data, but I don't have a finance or accounting background — this role may require more depth there than I have."
+    },
+    {
+      "name": "Enterprise Sales",
+      "weight": 0.2,
+      "triggers": [
+        "quota", "sales quota", "closing deals", "new logo", "pipeline management",
+        "account executive", "AE", "SDR", "cold outreach", "commission"
+      ],
+      "framingLine": "I've worked alongside sales teams and on GTM strategy, but I haven't carried a quota or been a practicing AE — this gap could matter if the role requires direct selling."
+    }
+  ],
+  "dealbreakers": [
+    {
+      "name": "PhD Required",
+      "triggers": ["phd required", "doctorate required", "ph.d. required", "phd is required"]
+    },
+    {
+      "name": "Security Clearance Required",
+      "triggers": ["security clearance", "top secret", "ts/sci", "secret clearance", "clearance required"]
+    },
+    {
+      "name": "Bar License Required",
+      "triggers": ["bar admission", "licensed attorney", "j.d. required", "must be an attorney"]
+    },
+    {
+      "name": "Medical License Required",
+      "triggers": ["md required", "medical license", "licensed physician", "board certified physician"]
+    }
+  ],
+  "scoringSpec": {
+    "bands": [
+      { "min": 70, "max": 100, "verdict": "APPLY" },
+      { "min": 45, "max": 69, "verdict": "STRETCH" },
+      { "min": 0,  "max": 44, "verdict": "SKIP" }
+    ]
+  }
+}
