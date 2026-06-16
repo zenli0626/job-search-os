@@ -22,6 +22,7 @@ Your KB lives at a private path you control (`$CAREER_KB_PATH`). The templates d
 | `gap-analysis.template.md` | Known gaps vs. target roles, with framing strategies |
 | `resume-variants.template.md` | Which resume variant targets which JD type |
 | `skills-matrix.template.md` | Skills by level with evidence citations |
+| `work-log.template.md` | Low-friction running capture of recent wins — the input to CV Refresh |
 
 Copy these to your private directory, fill them in, and set `CAREER_KB_PATH` in your shell to point there.
 
@@ -77,3 +78,21 @@ The private KB retains full precision. Public artifacts apply the mask. The skil
 ```
 
 All outputs are grounded in your KB. If a story doesn't exist in the KB, the Brain will tell you it's missing rather than inventing one.
+
+---
+
+## Keeping the KB Fresh — CV Refresh
+
+A KB built once goes stale: your resume undersells your last six months and your STAR bank is missing your best recent story. The **CV Refresh** workflow (`cv-refresh.prompt.md`) is the maintenance loop that keeps the single source of truth actually true.
+
+**The pattern:**
+
+1. **Capture as you go.** Jot one line into `work-log.md` (from `templates/work-log.template.md`) whenever something happens — a shipped project, a metric that moved, strong feedback, a new skill. Low friction, no formatting.
+2. **Refresh on a cadence.** Monthly (or before a job-search sprint), run the CV Refresh prompt. It ingests everything new in the work log, drafts STAR stories for what's worth keeping, updates the skills matrix and gap analysis, surfaces which resume bullets each variant should now carry, and outputs a **"What changed this refresh"** diff.
+3. **Same discipline.** No fabrication, measured-vs-targeted, append-don't-overwrite. The refresh promotes real evidence; it never inflates.
+
+```
+@cv-refresh Refresh my Career KB from work-log.md plus my commits since [last refresh date]
+```
+
+CV Refresh (new work → KB) pairs with the **Outcome Loop** in stage 08 (interview signal → KB). Together they turn the KB from a one-time document into a living system.
