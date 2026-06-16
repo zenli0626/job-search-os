@@ -2,6 +2,10 @@
 
 An open, agent-driven operating system for a modern job search — five connected stages from knowing yourself to a weekly manager loop. Each stage is a lightweight, forkable module: markdown knowledge bases, small scripts, local HTML dashboards, and reusable LLM prompts. No server required. No third-party SaaS. The whole system runs on Claude Code skills + stdlib Python + vanilla JS.
 
+![Job Search OS — Multi-Agent Architecture](docs/architecture.png)
+
+> Interactive version: [`docs/architecture.html`](docs/architecture.html)
+
 ---
 
 ## System Diagram
